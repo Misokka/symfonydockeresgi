@@ -11,6 +11,4 @@ use Doctrine\ORM\Mapping\Entity;
 #[Entity(repositoryClass: MovieRepository::class)]
 class Movie extends Media
 {
-
-
 }

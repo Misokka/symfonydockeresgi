@@ -11,11 +11,9 @@ use \App\Enum\MediaTypeEnum;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
 use Doctrine\ORM\Mapping\DiscriminatorMap;
 use Doctrine\ORM\Mapping\InheritanceType;
-use \App\Entity\Movie;
-use \App\Entity\Serie;
 
 #[InheritanceType('JOINED')]
-#[DiscriminatorColumn(name: 'mediaType', type: 'string')]
+#[DiscriminatorColumn(name: 'discr', type: 'string')]
 #[DiscriminatorMap(['movie' => Movie::class, 'serie' => Serie::class])]
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 class Media
@@ -75,9 +73,6 @@ class Media
 
     #[ORM\Column]
     private array $casting = [];
-
-    #[ORM\Column(enumType: MediaTypeEnum::class)]
-    private ?MediaTypeEnum $mediaType = null;
 
     public function __construct()
     {
@@ -311,18 +306,6 @@ class Media
     public function setCasting(array $casting): static
     {
         $this->casting = $casting;
-
-        return $this;
-    }
-
-    public function getMediaType(): ?MediaTypeEnum
-    {
-        return $this->mediaType;
-    }
-
-    public function setMediaType(MediaTypeEnum $mediaType): static
-    {
-        $this->mediaType = $mediaType;
 
         return $this;
     }
