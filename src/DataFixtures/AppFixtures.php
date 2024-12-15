@@ -24,6 +24,7 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
@@ -41,6 +42,12 @@ class AppFixtures extends Fixture
     public const MAX_COMMENTS_PER_MEDIA = 10;
     public const MAX_PLAYLIST_SUBSCRIPTION_PER_USERS = 3;
 
+    private UserPasswordHasherInterface $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->passwordHasher = $passwordHasher;
+    }
     public function load(ObjectManager $manager): void
     {
         $users = [];
@@ -67,6 +74,7 @@ class AppFixtures extends Fixture
 
         $manager->flush();
     }
+
 
     protected function createSubscriptions(ObjectManager $manager, array $users, array &$subscriptions): void
     {
@@ -127,13 +135,20 @@ class AppFixtures extends Fixture
     {
         for ($i = 0; $i < self::MAX_USERS; $i++) {
             $user = new User();
-            $user->setEmail(email: "test_$i@example.com");
-            $user->setUsername(username: "test_$i");
-            $user->setPassword(password: 'coucou');
+            $user->setEmail("test_$i@example.com");
+            $user->setUsername("test_$i");
+
+            // Hashage du mot de passe
+            $hashedPassword = $this->passwordHasher->hashPassword($user, 'password');
+            $user->setPassword($hashedPassword);
+
+            // Ajout du rôle
+            $user->setRoles(['ROLE_USER']);
+
             $user->setAccountStatus(UserAccountStatusEnum::ACTIVE);
             $users[] = $user;
 
-            $manager->persist(object: $user);
+            $manager->persist($user);
         }
     }
 
